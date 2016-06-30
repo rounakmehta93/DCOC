@@ -29,7 +29,7 @@ float interpol(float x1_space[], float x2_space[], float w_space[], float ***V, 
 float max_of_V(float ***V, float ***V_old, int x1_len, int x2_len, int w_len);
 void deepcopy(float ***V, float ***V_old, int x1_len, int x2_len,int w_len);
 
-void value_iteration(){
+int value_iteration(){
     
     //init stuff
     float stopping_criterion = 0.01;
@@ -131,7 +131,31 @@ void value_iteration(){
     
     
     printf("Value iteration Done\n");
+    FILE *outfile;
+    char *outfilename = "/Users/Rounak/Desktop/Summer project/DCOC/DCOC_in_C/DCOC_in_C/abc.csv";
+    printf("%s",outfilename);
+    if ((outfile = fopen(outfilename,"w")) == NULL)
+    {
+        printf("Error opening output file.\n");
+        return -1;
+    }
+    else{
+        printf("file opened\n");
+    }
+    for(i=0;i<x1_len;i++)
+    {
+        for(j=0;j<x2_len;j++)
+        {
+            for(k=0;k<w_len;k++){
+                fprintf(outfile,"%f,",V[i][j][k]);
+            }
+            fprintf(outfile,"::::::");
+        }
+        fprintf(outfile,"\n");
+    }
+    fclose(outfile);
     
+    return 0;
 }
 
 void pendulum_nonlinearmodel_ss(float X[], float U, float F, float del_t, float x_new[]){
@@ -247,9 +271,9 @@ int main(int argc, const char * argv[]) {
     // Debug area
     
     printf("Hello, World!\n %.2f\n",2.0);
-    
+    int status;
     
     //serious shit starts here:
-    value_iteration();
+    status = value_iteration();
     return 0;
 }
