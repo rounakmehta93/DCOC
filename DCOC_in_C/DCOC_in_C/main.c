@@ -5,120 +5,130 @@
 //  Created by Rounak on 29/6/16.
 //  Copyright © 2016 Rounak. All rights reserved.
 //
+#include "globals.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> //required for memcpy
 #include <math.h>
-#define PI = 3.14159 //for some reason can't use this in the code
-
-//INIT
-
-//need to specify length in 2nd argument
-const float pi = 3.14159;
-const float prob_matrix[][3] = {{0.5, 0.9, 0.4}, {0.1, 0.2, 0.7}, {0.3, 0.3, 0.4}};
-const float del_t = 0.01;
-const float u_space[] = {-0.01,0,0.01};
-float w_space[] = {-0.1,0,0.1};
-const float x_min[] = {-pi/8,-1};
-const float x_max[] = {pi/8,1};
-const float step_size[] = {pi/20,0.1};
+#include "interpolation.h"
+#define PI 3.14
 
 
-void pendulum_nonlinearmodel_ss(float X[], float U, float F, float del_t, float x_new[]);
+extern int x1_len, x2_len, w_len, u_len;
+
+
+void pendulum_nonlinearmodel_ss(float X[], float U, float F, float x_new[]);
 float interpol(float x1_space[], float x2_space[], float w_space[], float ***V, float x1,float x2,float w, int x1_len, int x2_len, int w_len);
-float max_of_V(float ***V, float ***V_old, int x1_len, int x2_len, int w_len);
-void deepcopy(float ***V, float ***V_old, int x1_len, int x2_len,int w_len);
+float max_of_V(float V[x1_len][x2_len][w_len], float V_old[x1_len][x2_len][w_len]);
+void deepcopy(float V[x1_len][x2_len][w_len], float V_old[x1_len][x2_len][w_len]);
 
 int value_iteration(){
-    
+    //float lol = prob_matrix1[0][0];
+    //printf("%f",lol);
     //init stuff
-    float stopping_criterion = 0.01;
-    float *x1_space, *x2_space, ***V, ***V_old, *temp_w, *temp_u;
+    static 
     int i,j,k;
-    int x1_len = (x_max[0]-x_min[0])/step_size[0] + 1;
-    int x2_len = (x_max[1]-x_min[1])/step_size[1] + 1;
-    int w_len = sizeof(w_space)/sizeof(float);
-    int u_len = sizeof(u_space)/sizeof(float);
+    
+    
+    float V[x1_len][x2_len][w_len];
+    float V_old[x1_len][x2_len][w_len];
+    
     float x_new[] = {0,0};
+    float x_old[] = {1,0};
     float g = 1;
     
-    x1_space = (float *)(malloc(x1_len*sizeof(float)));
+    float x1_space[x1_len];
+    float x2_space[x2_len];
+    
+    float temp_w[w_len];
+    float temp_u[u_len];
+    
+    int c = 0, d=0;
+    
+    float max_temp_u = 0;
+    int iteration = 0;
+    
+    
     for(i=0;i<x1_len;i++){
         x1_space[i] = x_min[0] + step_size[0]*i;
         //printf("%f ",x1_space[i]);
     }
-    printf("\n");
     
-    x2_space = (float *)(malloc(x2_len*sizeof(float)));
     for(i=0;i<x2_len;i++){
         x2_space[i] = x_min[1] + step_size[1]*i;
-        //printf("%f ",x2_space[i]);
     }
     
-    temp_w = (float *)(malloc(w_len*sizeof(float)));
-    temp_u = (float *)(malloc(u_len*sizeof(float)));
     
-    V = (float ***)(malloc(x1_len*sizeof(float *)));
-    V_old = (float ***)(malloc(x1_len*sizeof(float *)));
+   
     for(i=0;i<x1_len;i++){
-        V[i] = (float **)(malloc(x2_len*sizeof(float *)));
-        V_old[i] = (float **)(malloc(x2_len*sizeof(float *)));
         for(j=0;j<x2_len;j++){
-            V[i][j]=(float *)(malloc(w_len*sizeof(float)));
-            V_old[i][j]=(float *)(malloc(w_len*sizeof(float)));
             for(k=0;k<w_len;k++){
-                V[i][j][k] = 0;
+                V[i][j][k] = 1.5;
                 V_old[i][j][k] = 1;
                 
             }
         }
     }
     
+    //DEBUG AREA
+    //printf("%d x1_len \n",x1_len);
+    //printf("%f probmatrix\n",prob_matrix[0][0]);
+    //printf("%f sc\n",stopping_criterion);
+    //printf("%f x\n",x_new[1]);
+    pendulum_nonlinearmodel_ss(x_old, u_space[c], w_space[k],x_new);
+    //printf("%f x\n",x_new[1]);
     
-    float a[] = {0,0};
-    float x1=0.1,x2=0.1,w=0.1;
-    pendulum_nonlinearmodel_ss(&a[0], 1, 0, del_t, &x_new[0]);
-    printf("array gotten %f,%f\n",x_new[0],x_new[1]);
+    float debug;
+    int deb;
+    deb = find_nearest_neighbor(-0.1, 0.1, 0, 1);
+    //printf("%d deb\n",deb);
+    debug = interpol_3D(x1_space, x2_space, w_space, V, -0.2456,-0.8015, 0.1);//interpol might be off or V update
     
-    float temp;
-    temp= interpol(x1_space, x2_space, w_space, V, x1, x2, w,  x1_len, x2_len, w_len);
-    printf("d %f",temp);
-    //V_old = memcpy(&V[0][0][0], &V_old[0][0][0], x1_len*x2_len*w_len*sizeof(float));
+    printf("%f debug\n",debug);
+   
     
-    i = 0, j=0, k=0;
-    int c = 0, d=0;
-    float x_old[] = {0,0};
-    float max_temp_u = 0;
-    int iteration = 0;
-    while(max_of_V(V, V_old, x1_len, x2_len, w_len) > stopping_criterion){
-        deepcopy(V, V_old, x1_len, x2_len, w_len);
+    debug = max_of_V(V, V_old);
+    
+    
+    
+    
+    while(max_of_V(V, V_old) > stopping_criterion){
+        deepcopy(V, V_old);
+        
         //printf("cpy %f %f \n",V[1][1][1],V_old[1][1][1]);
         for(i=0;i<x1_len;i++){
             for(j=0;j<x2_len;j++){
                 for(k=0;k<w_len;k++){
+                    max_temp_u = 0;
                     for(c=0;c<u_len;c++){
                         x_old[0] = x1_space[i];
                         x_old[1] = x2_space[j];
-                        pendulum_nonlinearmodel_ss(&x_old[0], u_space[c], w_space[k], del_t, &x_new[0]);
+                        //printf("1 %f 2 %f 3 %f 4 %f\n", x1_space[i], x2_space[j],u_space[c], w_space[k]);
+                        pendulum_nonlinearmodel_ss(x_old, u_space[c], w_space[k],x_new);
                         //printf("non linear %f %f \n",x_new[0],x_new[1]);
                         temp_u[c] = g;
                         for(d=0;d<w_len;d++){
-                            temp_w[d] = interpol(x1_space, x2_space, w_space, V, x_new[0], x_new[1], w_space[d],  x1_len, x2_len, w_len);
-                            
+                            temp_w[d] = d+1;//interpol_3D(x1_space, x2_space, w_space, V, x_new[0], x_new[1], w_space[d]);
+                            //printf("%f temp_w[d]\n",temp_w[d]);
                             temp_u[c] = temp_u[c] + temp_w[d]*prob_matrix[k][d];
-                            //printf("temp w[d] %f\n",temp_w[d]);
+                            
                         }
-                        
+                        //printf("temp u[c] %f\n",temp_u[c]);
                         if(temp_u[c]>max_temp_u){
                             max_temp_u = temp_u[c];
                         }
                         
                     }
+                    
                     V[i][j][k] = max_temp_u;
+                    printf("V[i][j][k] %f \n",V[i][j][k]);
+                    printf("================\n");
                 }
             }
+         
         }
-        printf("iteration %d value %f \n",iteration, max_of_V(V, V_old, x1_len, x2_len, w_len));
+     
+        printf("iteration %d value %f \n",iteration, max_of_V(V, V_old));
         
         iteration += 1;
 
@@ -131,13 +141,18 @@ int value_iteration(){
     
     
     printf("Value iteration Done\n");
+    return(0);
+}
+
+    int writeToFile(float V[x1_len][x2_len][w_len]){
+        int i,j,k;
     FILE *outfile;
-    char *outfilename = "/Users/Rounak/Desktop/Summer project/DCOC/DCOC_in_C/DCOC_in_C/abc.csv";
+    char *outfilename = "/Users/Rounak/Desktop/Summer project/DCOC/DCOC_in_C/DCOC_in_C/abc.txt";
     printf("%s",outfilename);
     if ((outfile = fopen(outfilename,"w")) == NULL)
     {
         printf("Error opening output file.\n");
-        return -1;
+        return(-1);
     }
     else{
         printf("file opened\n");
@@ -149,16 +164,16 @@ int value_iteration(){
             for(k=0;k<w_len;k++){
                 fprintf(outfile,"%f,",V[i][j][k]);
             }
-            fprintf(outfile,"::::::");
+            //fprintf(outfile,"::::::");
         }
-        fprintf(outfile,"\n");
+        //fprintf(outfile,"\n");
     }
     fclose(outfile);
     
     return 0;
 }
 
-void pendulum_nonlinearmodel_ss(float X[], float U, float F, float del_t, float x_new[]){
+void pendulum_nonlinearmodel_ss(float X[num_states], float U, float F, float x_new[num_states]){
     
     float m = 0.2;
     float b = 0.001;
@@ -170,72 +185,11 @@ void pendulum_nonlinearmodel_ss(float X[], float U, float F, float del_t, float 
     float T = U;
     x_new[0] = X[0] + del_t* th_;
     x_new[1] = X[1] + del_t* (-m*g*l*sin(th) -b*th_ + F*l*cos(th) + T)/I; //cos and sin in radians
+    //printf("%f x in function \n",x_new[1]);
     
     
 }
-
-float interpol(float x1_space[], float x2_space[], float w_space[], float ***V, float x1,float  x2, float w, int x1_len, int x2_len, int w_len){
-    //method for trilinear inerpolation. implement recursive way later. also search should be binary.
-    //find the grid to interpolate in
-    
-    //returns 0 when out of bounds
-    float a1, a2, b1, b2, c1, c2;
-    float A1, A2, A3, A4, B1, B2, C;
-    int a, b, c;
-    short return_flag = -3;
-    
-    
-    for(a=1; a < x1_len; a++){
-        if(x1 >= x1_space[a-1] && x1 <=x1_space[a] ){
-            a1 = x1_space[a-1];
-            a2 = x1_space[a];
-            return_flag += 1;
-            break;
-        }
-    }
-   
-    for(b=1; b < x2_len; b++){
-        if(x2 >= x2_space[b-1] && x2 <=x2_space[b] ){
-            b1 = x2_space[b-1];
-            b2 = x2_space[b];
-            return_flag += 1;
-            break;
-        }
-        
-    }
-    for(c=1; c < w_len; c++){
-        if(w >= w_space[c-1] && w <=w_space[c] ){
-            c1 = w_space[c-1];
-            c2 = w_space[c];
-            return_flag += 1;
-            break;
-        }
-    }
-    
-    if(return_flag < 0){
-        return(0);
-    }
-    
-
-    
-    
-    
-    A1 = V[a-1][b-1][c-1] + (V[a-1][b-1][c] - V[a-1][b-1][c-1])*(w - c1)/(c2-c1);
-    A3 = V[a][b-1][c-1] + (V[a][b-1][c] - V[a][b-1][c-1])*(w - c1)/(c2-c1);
-    A2 = V[a-1][b][c-1] + (V[a-1][b][c] - V[a-1][b][c-1])*(w - c1)/(c2-c1);
-    A4 = V[a][b][c-1] + (V[a][b][c] - V[a][b][c-1])*(w - c1)/(c2-c1);
-    
-    
-    B1 = A1 + (A2-A1)*(x2-b1)/(b2-b1);
-    B2 = A3 + (A4-A3)*(x2-b1)/(b2-b1);
-    
-    C = B1 + (B2 - B1)*(x1-a1)/(a2-a1);
-    
-    return C;
-    
-}
-
-float max_of_V(float ***V, float ***V_old, int x1_len, int x2_len, int w_len){
+float max_of_V(float V[x1_len][x2_len][w_len], float V_old[x1_len][x2_len][w_len]){
     int i, j, k;
     float temp;
     float max = fabs(V[0][0][0]-V_old[0][0][0]);
@@ -252,7 +206,7 @@ float max_of_V(float ***V, float ***V_old, int x1_len, int x2_len, int w_len){
     return max;
 }
 
-void deepcopy(float ***V, float ***V_old, int x1_len, int x2_len,int w_len){
+void deepcopy(float V[x1_len][x2_len][w_len], float V_old[x1_len][x2_len][w_len]){
     int i, j, k;
     for(i=0;i<x1_len;i++){
         for(j=0;j<x2_len;j++){
@@ -264,16 +218,30 @@ void deepcopy(float ***V, float ***V_old, int x1_len, int x2_len,int w_len){
     }
 }
 
+void test_interpol(){
+    float x1_space[3] = {1,2,3};
+    float x2_space[3] = {1,2,3};
+    float w_space[3] = {1,2,3};
+    float V[3][3][3] = {{{10,10,10},{20,20,20},{30,30,30}},{{40,40,40},{50,50,50},{60,60,60}},{{70,70,70},{80,80,80},{90,90,90}}};
+    float x_new[2] = {1,1};
+    int d = 1;
+    float ans;
+    printf("big lol%f",V[1][0][1]);
+    ans = interpol_3D(x1_space, x2_space, w_space, V, x_new[0], x_new[1], w_space[d]);
+    printf("ans %f \n ",ans);
+}
 
 
 
 int main(int argc, const char * argv[]) {
     // Debug area
     
-    printf("Hello, World!\n %.2f\n",2.0);
-    int status;
+    printf("Hello, World!\n %d\n",9);
     
+    int status;
+    init_value_iteration();
     //serious shit starts here:
-    status = value_iteration();
+    test_interpol();
+    //status = value_iteration();
     return 0;
 }
