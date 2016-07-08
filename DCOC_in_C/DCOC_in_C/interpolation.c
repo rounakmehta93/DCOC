@@ -54,7 +54,7 @@ float interpol_3D(float x1_space[x1_len], float x2_space[x2_len], float w_space[
     ix2 = find_nearest_neighbor(x2 ,step_size[1], x2_space[0], x2_space[x2_len-1]);
     ix3 = find_nearest_neighbor(w ,step_size[2], w_space[0], w_space[w_len-1]);
     
-    printf("\n ix1 %d, ix2 %d ,ix3 %d\n", ix1, ix2, ix3);
+    //printf("\n ix1 %d, ix2 %d ,ix3 %d\n", ix1, ix2, ix3);
     if(ix1==-1 || ix2==-1 || ix3==-1){
         return 0;
     }
@@ -63,12 +63,13 @@ float interpol_3D(float x1_space[x1_len], float x2_space[x2_len], float w_space[
     V_inter[1][0] = interpol_1D(V[ix1+1][ix2][ix3], V[ix1+1][ix2][ix3+1], w_space[ix3], w, step_size[2]);
     V_inter[0][1] = interpol_1D(V[ix1][ix2+1][ix3], V[ix1][ix2+1][ix3+1], w_space[ix3], w, step_size[2]);
     V_inter[1][1] = interpol_1D(V[ix1+1][ix2+1][ix3], V[ix1+1][ix2+1][ix3+1], w_space[ix3], w, step_size[2]);
-    printf("%f",V[0][2][ix3]);
-    printf("\nV_inter %f %f %f %f\n",V_inter[0][0], V_inter[1][0], V_inter[0][1], V_inter[1][1]);
+    
+    //printf("\nV_inter %f %f %f %f\n",V_inter[0][0], V_inter[1][0], V_inter[0][1], V_inter[1][1]);
     
     V_inter2[0] = interpol_1D(V_inter[0][0], V_inter[0][1], x2_space[ix2], x2, step_size[1]);
     V_inter2[1] = interpol_1D(V_inter[1][0], V_inter[1][1], x2_space[ix2], x2, step_size[1]);
     
+    //printf("V_inter2 %f %f \n", V_inter2[0], V_inter2[1]);
     V_inter3 = interpol_1D(V_inter2[0], V_inter2[1], x1_space[ix1], x1, step_size[0]);
     
     

@@ -15,6 +15,15 @@
 
 
 extern int x1_len, x2_len, w_len, u_len;
+extern float prob_matrix[3][3]; // need to specify lengths for multi dim arrays
+extern float del_t;
+extern float u_space[];
+extern float w_space[];
+extern float x_min[];
+extern float x_max[];
+extern float step_size[];
+extern float stopping_criterion;
+extern int num_states;
 
 
 void pendulum_nonlinearmodel_ss(float X[], float U, float F, float x_new[]);
@@ -108,7 +117,7 @@ int value_iteration(){
                         //printf("non linear %f %f \n",x_new[0],x_new[1]);
                         temp_u[c] = g;
                         for(d=0;d<w_len;d++){
-                            temp_w[d] = d+1;//interpol_3D(x1_space, x2_space, w_space, V, x_new[0], x_new[1], w_space[d]);
+                            temp_w[d] = interpol_3D(x1_space, x2_space, w_space, V, x_new[0], x_new[1], w_space[d]);
                             //printf("%f temp_w[d]\n",temp_w[d]);
                             temp_u[c] = temp_u[c] + temp_w[d]*prob_matrix[k][d];
                             
@@ -121,8 +130,9 @@ int value_iteration(){
                     }
                     
                     V[i][j][k] = max_temp_u;
-                    printf("V[i][j][k] %f \n",V[i][j][k]);
-                    printf("================\n");
+                    //printf("V[i][j][k] %f \n",V[i][j][k]);
+                    //printf("V_old[i][j][k] %f \n",V_old[i][j][k]);
+                    //printf("================\n");
                 }
             }
          
@@ -140,14 +150,18 @@ int value_iteration(){
 
     
     
-    printf("Value iteration Done\n");
+    printf("Value iteration Done\n Writing to file...\n");
+    int status;
+    status = writeToFile(V);
+    printf("Done\n");
+    
     return(0);
 }
 
     int writeToFile(float V[x1_len][x2_len][w_len]){
         int i,j,k;
     FILE *outfile;
-    char *outfilename = "/Users/Rounak/Desktop/Summer project/DCOC/DCOC_in_C/DCOC_in_C/abc.txt";
+    char *outfilename = "/Users/Rounak/Desktop/Summer project/DCOC/DCOC_in_C/DCOC_in_C/V_out.txt";
     printf("%s",outfilename);
     if ((outfile = fopen(outfilename,"w")) == NULL)
     {
@@ -155,14 +169,14 @@ int value_iteration(){
         return(-1);
     }
     else{
-        printf("file opened\n");
+        printf("\nfile opened\n");
     }
     for(i=0;i<x1_len;i++)
     {
         for(j=0;j<x2_len;j++)
         {
             for(k=0;k<w_len;k++){
-                fprintf(outfile,"%f,",V[i][j][k]);
+                fprintf(outfile,"%f\n",V[i][j][k]);
             }
             //fprintf(outfile,"::::::");
         }
@@ -196,7 +210,7 @@ float max_of_V(float V[x1_len][x2_len][w_len], float V_old[x1_len][x2_len][w_len
     for(i=0;i<x1_len;i++){
         for(j=0;j<x2_len;j++){
             for(k=0;k<w_len;k++){
-                temp = fabs(V[0][0][0]-V_old[0][0][0]);
+                temp = fabs(V[i][j][k]-V_old[i][j][k]);
                 if(temp > max){
                     max = temp;
                 }
@@ -222,13 +236,41 @@ void test_interpol(){
     float x1_space[3] = {1,2,3};
     float x2_space[3] = {1,2,3};
     float w_space[3] = {1,2,3};
+    x1_len = 3;
+    x2_len = 3;
+    w_len = 3;
     float V[3][3][3] = {{{10,10,10},{20,20,20},{30,30,30}},{{40,40,40},{50,50,50},{60,60,60}},{{70,70,70},{80,80,80},{90,90,90}}};
-    float x_new[2] = {1,1};
+    float x_new[2] = {3,3.1};
     int d = 1;
     float ans;
-    printf("big lol%f",V[1][0][1]);
+    printf("\nbig lol%f",V[1][1][1]);
     ans = interpol_3D(x1_space, x2_space, w_space, V, x_new[0], x_new[1], w_space[d]);
     printf("ans %f \n ",ans);
+}
+
+void test_max(){
+    x1_len = 3;
+    x2_len = 3;
+    w_len = 3;
+    float V[3][3][3] = {{{10,10,10},{20,20,20},{30,30,30}},{{40,40,40},{50,50,50},{60,60,60}},{{70,70,70},{80,80,80},{90,90,90}}};
+    float V_old[3][3][3] = {{{30,10000,10},{20,20,20},{30,30,30}},{{40,40,40},{50,50,50},{60,60,60}},{{70,70,70},{80,80,80},{90,90,90}}};
+    float ans;
+    
+    ans = max_of_V(V, V_old);
+    printf("ans %f \n ",ans);
+}
+
+void test_copy(){
+    x1_len = 3;
+    x2_len = 3;
+    w_len = 3;
+    float V[3][3][3] = {{{10,10,10},{20,20,20},{30,30,30}},{{40,40,40},{50,50,50},{60,60,60}},{{70,70,70},{80,80,80},{90,90,90}}};
+    float V_old[3][3][3] = {{{20,10,10},{20,20,20},{30,30,30}},{{40,40,40},{50,50,50},{60,60,60}},{{70,70,70},{80,80,80},{90,90,90}}};
+    float ans;
+    
+    deepcopy(V, V_old);
+    V[0][0][0] = 10000;
+    printf("ans %f \n ",V_old[0][0][0]);
 }
 
 
@@ -241,7 +283,9 @@ int main(int argc, const char * argv[]) {
     int status;
     init_value_iteration();
     //serious shit starts here:
-    test_interpol();
-    //status = value_iteration();
+    //test_interpol();
+    //test_max();
+    //test_copy();
+    status = value_iteration();
     return 0;
 }
