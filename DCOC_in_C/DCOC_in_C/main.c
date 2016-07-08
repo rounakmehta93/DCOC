@@ -4,13 +4,16 @@
 //
 //  Created by Rounak on 29/6/16.
 //  Copyright © 2016 Rounak. All rights reserved.
-//
+// Doubts: Cannot declare array with length defined by a variable as global
+
 #include "globals.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> //required for memcpy
 #include <math.h>
 #include "interpolation.h"
+
+#include "test_pendulum.h"
 #define PI 3.14
 
 
@@ -30,6 +33,7 @@ void pendulum_nonlinearmodel_ss(float X[], float U, float F, float x_new[]);
 float interpol(float x1_space[], float x2_space[], float w_space[], float ***V, float x1,float x2,float w, int x1_len, int x2_len, int w_len);
 float max_of_V(float V[x1_len][x2_len][w_len], float V_old[x1_len][x2_len][w_len]);
 void deepcopy(float V[x1_len][x2_len][w_len], float V_old[x1_len][x2_len][w_len]);
+int writeToFile(float V[x1_len][x2_len][w_len]);
 
 int value_iteration(){
     //float lol = prob_matrix1[0][0];
@@ -54,7 +58,7 @@ int value_iteration(){
     
     int c = 0, d=0;
     
-    float max_temp_u = 0;
+    int max_temp_c = 0;
     int iteration = 0;
     
     
@@ -62,6 +66,7 @@ int value_iteration(){
         x1_space[i] = x_min[0] + step_size[0]*i;
         //printf("%f ",x1_space[i]);
     }
+     
     
     for(i=0;i<x2_len;i++){
         x2_space[i] = x_min[1] + step_size[1]*i;
@@ -108,7 +113,7 @@ int value_iteration(){
         for(i=0;i<x1_len;i++){
             for(j=0;j<x2_len;j++){
                 for(k=0;k<w_len;k++){
-                    max_temp_u = 0;
+                    max_temp_c = 0;
                     for(c=0;c<u_len;c++){
                         x_old[0] = x1_space[i];
                         x_old[1] = x2_space[j];
@@ -123,13 +128,13 @@ int value_iteration(){
                             
                         }
                         //printf("temp u[c] %f\n",temp_u[c]);
-                        if(temp_u[c]>max_temp_u){
-                            max_temp_u = temp_u[c];
+                        if(temp_u[c]>temp_u[max_temp_c]){
+                            max_temp_c = c;
                         }
                         
                     }
                     
-                    V[i][j][k] = max_temp_u;
+                    V[i][j][k] = temp_u[max_temp_c];
                     //printf("V[i][j][k] %f \n",V[i][j][k]);
                     //printf("V_old[i][j][k] %f \n",V_old[i][j][k]);
                     //printf("================\n");
@@ -273,6 +278,19 @@ void test_copy(){
     printf("ans %f \n ",V_old[0][0][0]);
 }
 
+void test_load(){
+    x1_len = 3;
+    x2_len = 3;
+    w_len = 3;
+    float V[3][3][3] = {{{10,10,10},{20,20,20},{30,30,30}},{{40,40,40},{50,50,50},{60,60,60}},{{70,70,70},{80,80,80},{90,90,90}}};
+    float V_loaded[3][3][3];
+    int status;
+    status = writeToFile(V);
+    load_V(V_loaded);
+    printf("V %f V_loaded %f",V[2][2][2],V_loaded[2][2][2]);
+    
+}
+
 
 
 int main(int argc, const char * argv[]) {
@@ -281,11 +299,16 @@ int main(int argc, const char * argv[]) {
     printf("Hello, World!\n %d\n",9);
     
     int status;
+    
     init_value_iteration();
     //serious shit starts here:
     //test_interpol();
     //test_max();
     //test_copy();
-    status = value_iteration();
+    //test_load();
+    //status = value_iteration();
+    test_pendulum();
     return 0;
 }
+
+

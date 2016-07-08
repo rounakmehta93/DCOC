@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1241CB1C1D2FCA5700194498 /* test_pendulum.c in Sources */ = {isa = PBXBuildFile; fileRef = 1241CB1A1D2FCA5700194498 /* test_pendulum.c */; };
+		1241CB1F1D2FDB7B00194498 /* pendulum_model.c in Sources */ = {isa = PBXBuildFile; fileRef = 1241CB1D1D2FDB7B00194498 /* pendulum_model.c */; };
 		1298FE011D24C75B00D4E868 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 1298FE001D24C75B00D4E868 /* main.c */; };
 		12DEA2411D2E267100285423 /* globals.c in Sources */ = {isa = PBXBuildFile; fileRef = 12DEA23F1D2E267100285423 /* globals.c */; };
 		12DEA2441D2E5DB200285423 /* interpolation.c in Sources */ = {isa = PBXBuildFile; fileRef = 12DEA2421D2E5DB200285423 /* interpolation.c */; };
@@ -25,6 +27,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1241CB1A1D2FCA5700194498 /* test_pendulum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_pendulum.c; sourceTree = "<group>"; };
+		1241CB1B1D2FCA5700194498 /* test_pendulum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_pendulum.h; sourceTree = "<group>"; };
+		1241CB1D1D2FDB7B00194498 /* pendulum_model.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pendulum_model.c; sourceTree = "<group>"; };
+		1241CB1E1D2FDB7B00194498 /* pendulum_model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pendulum_model.h; sourceTree = "<group>"; };
 		1298FDFD1D24C75B00D4E868 /* DCOC_in_C */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DCOC_in_C; sourceTree = BUILT_PRODUCTS_DIR; };
 		1298FE001D24C75B00D4E868 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		12DEA23F1D2E267100285423 /* globals.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = globals.c; sourceTree = "<group>"; };
@@ -68,6 +74,10 @@
 				12DEA2421D2E5DB200285423 /* interpolation.c */,
 				12DEA2431D2E5DB200285423 /* interpolation.h */,
 				12DEA2401D2E267100285423 /* globals.h */,
+				1241CB1A1D2FCA5700194498 /* test_pendulum.c */,
+				1241CB1B1D2FCA5700194498 /* test_pendulum.h */,
+				1241CB1D1D2FDB7B00194498 /* pendulum_model.c */,
+				1241CB1E1D2FDB7B00194498 /* pendulum_model.h */,
 			);
 			path = DCOC_in_C;
 			sourceTree = "<group>";
@@ -129,8 +139,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				12DEA2411D2E267100285423 /* globals.c in Sources */,
+				1241CB1C1D2FCA5700194498 /* test_pendulum.c in Sources */,
 				12DEA2441D2E5DB200285423 /* interpolation.c in Sources */,
 				1298FE011D24C75B00D4E868 /* main.c in Sources */,
+				1241CB1F1D2FDB7B00194498 /* pendulum_model.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
