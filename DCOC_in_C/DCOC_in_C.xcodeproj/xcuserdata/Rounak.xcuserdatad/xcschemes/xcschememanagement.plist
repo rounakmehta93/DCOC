@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>DCOC_5D.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 		<key>DCOC_in_C.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -12,6 +17,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>128CEBC11D377A8100E4EC22</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>1298FDFC1D24C75B00D4E868</key>
 		<dict>
 			<key>primary</key>
