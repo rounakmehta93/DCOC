@@ -29,6 +29,6 @@ void init_value_iteration(){
     w_len = sizeof(w_space)/sizeof(float);
     u_len = sizeof(u_space)/sizeof(float);
     
-    
-    printf("%d x1_len",x1_len);
+    //printf("%d init w_len\n",w_len);
+    //printf("%d x1_len",x1_len);
 }

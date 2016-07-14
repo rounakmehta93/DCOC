@@ -7,11 +7,13 @@
 // Doubts: Cannot declare array with length defined by a variable as global
 
 #include "globals.h"
+#include "globaltemp.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> //required for memcpy
 #include <math.h>
 #include "interpolation.h"
+#include "pendulum_model.h"
 
 #include "test_pendulum.h"
 #define PI 3.14
@@ -282,12 +284,18 @@ void test_load(){
     x1_len = 3;
     x2_len = 3;
     w_len = 3;
-    float V[3][3][3] = {{{10,10,10},{20,20,20},{30,30,30}},{{40,40,40},{50,50,50},{60,60,60}},{{70,70,70},{80,80,80},{90,90,90}}};
+    float V[3][3][3] = {{{10,10,10},{20,32030,20},{30,30,32230}},{{40,4090,40},{50,50,5087},{60,620,60}},{{710,700,720},{8110,810,80},{90,90,901}}};
     float V_loaded[3][3][3];
     int status;
     status = writeToFile(V);
+    x1_len = 3;
+    x2_len = 3;
+    w_len = 3;
     load_V(V_loaded);
     printf("V %f V_loaded %f",V[2][2][2],V_loaded[2][2][2]);
+    printf("V %f V_loaded %f",V[2][1][2],V_loaded[2][1][2]);
+    printf("V %f V_loaded %f",V[1][1][0],V_loaded[1][1][0]);
+    printf("V %f V_loaded %f",V[0][1][2],V_loaded[0][1][2]);
     
 }
 
@@ -295,8 +303,8 @@ void test_load(){
 
 int main(int argc, const char * argv[]) {
     // Debug area
-    
-    printf("Hello, World!\n %d\n",9);
+    arr[1] = 12;
+    printf("Hello, World!\n %d\n",arr[1]);
     
     int status;
     

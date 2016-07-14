@@ -8,7 +8,12 @@
 
 #ifndef globaltemp_h
 #define globaltemp_h
+#define ABC 5
 
 #include <stdio.h>
+int cool = 7;
+int arr[ABC];
 
 #endif /* globaltemp_h */
+
+//targets: create .h file for global variables. separate .c file for initializer functions. So you can have global arrays.

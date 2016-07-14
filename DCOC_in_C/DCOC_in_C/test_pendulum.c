@@ -10,6 +10,7 @@
 #include "pendulum_model.h"
 #include "interpolation.h"
 #include <stdlib.h>
+#include <time.h>
 
 
 extern int x1_len, x2_len, w_len, u_len;
@@ -22,15 +23,16 @@ extern float x_max[];
 extern float step_size[];
 extern float stopping_criterion;
 extern int num_states;
-
+int arr_len;
 
 
 void test_pendulum(){
+    srand ( (uint)time(NULL) ); //otherwise we get same random number sequence.
     float u, w = w_space[0];
     float t_max = 20;
     float x[2] = {0,0};
-    int arr_len = t_max/del_t + 1;
-    int i,exit_i;
+    arr_len = t_max/del_t + 1;
+    int i,exit_i = arr_len;
     float x_array[2][arr_len], t_array[arr_len], u_array[arr_len];
     
     float x1_space[x1_len];
@@ -55,7 +57,7 @@ void test_pendulum(){
     
     float V[x1_len][x2_len][w_len];
     load_V(V);
-    
+    printf("arr len %d\n",arr_len);
     for(i=1;i<arr_len;i++){
         //printf("i %d x_array[0] %f\n",i, x_array[0][i]);
         if(x[0]>x_max[0] || x[0]<x_min[0] || x[1]>x_max[1] || x[1]<x_min[1]){
@@ -65,14 +67,14 @@ void test_pendulum(){
         }
         u = get_u_value_iteration(V,x,w,x1_space, x2_space);
         w = markov_model(w);
-        printf("w %f\n",w);
+        //printf("w %f\n",w);
         pendulum_nonlinearmodel_ss1(x, u, w, x);
         x_array[0][i] = x[0];
         x_array[1][i] = x[1];
         u_array[i] = u;
         
     }
-    
+    writeToFileXU(x_array,u_array,t_array,exit_i);
 
 }
 
@@ -116,11 +118,13 @@ int indexOfw(float w){
 }
 
 void load_V(float V[x1_len][x2_len][w_len]){
+    //printf("x1_len %d x2_len %d w_len %d", x1_len, x2_len, w_len);
+    //printf("V %f, %f, %f\n",V[0][0][0], V[2][1][2], V[2][2][2]);
     int i=0,j=0,k=0;
     float number;
     FILE *infile;
     char *infilename = "/Users/Rounak/Desktop/Summer project/DCOC/DCOC_in_C/DCOC_in_C/V_out.txt";
-    printf("%s",infilename);
+    printf("%s\n",infilename);
     if ((infile = fopen(infilename,"r")) == NULL)
     {
         printf("Error opening input file.\n");
@@ -132,7 +136,7 @@ void load_V(float V[x1_len][x2_len][w_len]){
     
     while(fscanf(infile, "%f\n", &number) > 0 ){
         //printf("%f\n",number);
-       
+        V[i][j][k] = number;
         k++;
         if(k==w_len){
             k=0;
@@ -142,7 +146,7 @@ void load_V(float V[x1_len][x2_len][w_len]){
                 i++;
             }
         }
-        V[i][j][k] = number;
+        
     }
     //printf("x1_len %d i %d",x1_len,i);
     fclose(infile);
@@ -162,6 +166,7 @@ float markov_model(float w){
             //printf("%f",prob_matrix[i][j]);
         }
     }
+    
     float rndm = rand()/(float)RAND_MAX;
     //printf("rndm %f", rndm);
     for (int i = 0 ; i< w_len; i++){
@@ -172,4 +177,28 @@ float markov_model(float w){
     }
     
     return(-1);
+}
+
+
+int writeToFileXU(float x_array[2][arr_len], float u_array[arr_len], float t_array[arr_len], int exit_i){
+    int i;
+    FILE *outfile;
+    char *outfilename = "/Users/Rounak/Desktop/Summer project/DCOC/DCOC_in_C/DCOC_in_C/XandU.txt";
+    printf("%s",outfilename);
+    if ((outfile = fopen(outfilename,"w")) == NULL)
+    {
+        printf("Error opening output file.\n");
+        return(-1);
+    }
+    else{
+        printf("\nfile opened. Output = t x[0] x[1] u\n");
+    }
+    fprintf(outfile,"%s %s %s %s\n","t","x1","x2","u");
+    for(i=0;i<exit_i;i++)
+    {
+       fprintf(outfile,"%f %f %f %f\n",t_array[i],x_array[0][i], x_array[1][i],u_array[i]);
+    }
+    fclose(outfile);
+    
+    return 0;
 }
