@@ -158,7 +158,7 @@ void load_V(){
 double markov_model(double w){
     int w_index = indexOfw(w);
     double row_sum;
-    double prob_matrix_cdf[3][3];
+    double prob_matrix_cdf[PROB_MATRIX_LEN][PROB_MATRIX_LEN];
     for (int i = 0; i< w_len; i++){
         row_sum=0;
         for(int j = 0; j< w_len; j++){

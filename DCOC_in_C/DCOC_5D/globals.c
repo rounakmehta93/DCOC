@@ -11,13 +11,13 @@
 double prob_matrix_cdf[PROB_MATRIX_LEN][PROB_MATRIX_LEN];
 double prob_matrix[PROB_MATRIX_LEN][PROB_MATRIX_LEN] = {{0.2, 0.1, 0.4,0.3}, {0.1, 0.2, 0.4, 0.3}, {0.3, 0.3, 0.2, 0.2}, {0.25, 0.25, 0.25,0.25}};
 double del_t = 0.01;
-double u_space[] = {-0.002,-0.001,0,0.001,0.002};
+double u_space[] = {-1,-0.5,0,0.5,1};
 double w_space[] = {-0.5,-0.25,0,0.25,0.5};
 
 double x1_space[x1_len],x2_space[x2_len],x3_space[x3_len];
 double x0_space[x0_len];
-double x_min[] = {-5,-1,-PI/8,-1};
-double x_max[] = {5,1,PI/8,1};
+double x_min[] = {-5,-2,-PI/8,-2};
+double x_max[] = {5,2,PI/8,2};
 double step_size[num_states];
 double stopping_criterion = 0.01;
 
