@@ -314,7 +314,7 @@ int main(int argc, const char * argv[]) {
     //test_max();
     //test_copy();
     //test_load();
-    //status = value_iteration();
+    status = value_iteration();
     test_pendulum();
     return 0;
 }

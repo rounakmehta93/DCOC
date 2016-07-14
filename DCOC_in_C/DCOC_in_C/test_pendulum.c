@@ -29,7 +29,7 @@ int arr_len;
 void test_pendulum(){
     srand ( (uint)time(NULL) ); //otherwise we get same random number sequence.
     float u, w = w_space[0];
-    float t_max = 20;
+    float t_max = 30;
     float x[2] = {0,0};
     arr_len = t_max/del_t + 1;
     int i,exit_i = arr_len;
