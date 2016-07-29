@@ -14,10 +14,10 @@ i = 1;
 x_array(:,i) = x;
 
 for i = 2:size(t_array,2)
-    u = -K*x;
+    u = 0;%-K*x;
     x = nonlinearmodel_ss(x,u,del_t);
     
-    x(3) = minimize_angle(x(3));
+    
     x_array(:,i) = x;
     u_array(:,i) = u;
     

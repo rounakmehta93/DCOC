@@ -9,15 +9,20 @@
 #include "globals.h"
 
 double prob_matrix_cdf[PROB_MATRIX_LEN][PROB_MATRIX_LEN];
-double prob_matrix[PROB_MATRIX_LEN][PROB_MATRIX_LEN] = {{0.2, 0.1, 0.4,0.3}, {0.1, 0.2, 0.4, 0.3}, {0.3, 0.3, 0.2, 0.2}, {0.25, 0.25, 0.25,0.25}};
-double del_t = 0.01;
-double u_space[] = {-1,-0.5,0,0.5,1};
-double w_space[] = {-0.5,-0.25,0,0.25,0.5};
+double prob_matrix[PROB_MATRIX_LEN][PROB_MATRIX_LEN] = {{1}};/*
+                                                        {{0.2, 0.1, 0.4, 0.2, 0.1}, 
+                                                        {0.1, 0.2, 0.3, 0.2, 0.2}, 
+                                                        {0.1, 0.2, 0.2, 0.3, 0.2}, 
+                                                        {0.2, 0.2, 0.2,0.2, 0.2},
+                                                        {0.3, 0.1, 0.3,0.1, 0.2}};*/
+double del_t = 0.002;
+double u_space[u_len] = {-5,-2.5,0,2.5,5};
+double w_space[w_len] = {5.1};//{-5.2,-2.6,0,2.6,5.2};//needs to be equally spaced //needs to have at least 2 elements for interpolation
 
 double x1_space[x1_len],x2_space[x2_len],x3_space[x3_len];
 double x0_space[x0_len];
-double x_min[] = {-5,-2,-PI/8,-2};
-double x_max[] = {5,2,PI/8,2};
+double x_min[] = {-0.32,-1,-0.43,-1.05}; //25 deg and 60 deg/sec
+double x_max[] = {0.32,1,0.43,1.05};
 double step_size[num_states];
 double stopping_criterion = 0.01;
 

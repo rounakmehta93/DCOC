@@ -11,14 +11,14 @@
 #define PI 3.14
 #include <stdio.h>
 
-
-#define PROB_MATRIX_LEN 5
+#define NTHREADS 2
+#define PROB_MATRIX_LEN 1
 #define x0_len 10
-#define x1_len 10
-#define x2_len 10
-#define x3_len 10
+#define x1_len 15
+#define x2_len 15
+#define x3_len 15
 
-#define w_len 5
+#define w_len 1
 #define u_len 5
 
 #define num_states 4

@@ -67,8 +67,8 @@ int value_iteration(){
             for(i2=0;i2<x2_len;i2++){
                 for(i3=0; i3<x3_len;i3++){
                     for(i4=0; i4<w_len; i4++){
-                        V_old[i0][i1][i2][i3][i4] = 0;
-                        V[i0][i1][i2][i3][i4] = 1;
+                        V_old[i0][i1][i2][i3][i4] = 1;
+                        V[i0][i1][i2][i3][i4] = 0;
                     }
                 }
                 
@@ -80,6 +80,8 @@ int value_iteration(){
     while(max_of_V() > stopping_criterion){
         deepcopy();
         
+        #pragma omp parallel num_threads(NTHREADS)
+        #pragma omp for
         for(i0=0;i0<x0_len;i0++){
             parallel(i0);
         }
@@ -109,13 +111,13 @@ void parallel(int i0){
                         x_old[1] = x1_space[i1];
                         x_old[2] = x2_space[i2];
                         x_old[3] = x3_space[i3];
-                        
+                        int lol = 2;
                         //printf("1 %lf 2 %lf 3 %lf 4 %lf\n", x1_space[i], x2_space[j],u_space[c], w_space[k]);
-                        pendulum_nonlinearmodel_ss(x_old, u_space[c], w_space[k],x_new);
+                        pendulum_nonlinearmodel_ss(x_old, u_space[c], w_space[k],x_new,lol);
                         //printf("non linear %lf %lf \n",x_new[0],x_new[1]);
                         temp_u[c] = g;
                         for(int d=0;d<w_len;d++){
-                            temp_w[d] = interpol_5D(x_new[0], x_new[1], x_new[2],x_new[3], w_space[d]);
+                            temp_w[d] = interpol_4D(x_new[0], x_new[1], x_new[2],x_new[3], w_space[d]);
                             //printf("%lf temp_w[d]\n",temp_w[d]);
                             temp_u[c] = temp_u[c] + temp_w[d]*prob_matrix[k][d];
                             
@@ -126,7 +128,7 @@ void parallel(int i0){
                         }
                         
                     }
-                    
+                    //printf("%lf temp_u[max_temp]\n",temp_u[max_temp_c]);
                     V[i0][i1][i2][i3][k] = temp_u[max_temp_c];
                     //printf("V[i][j][k] %lf \n",V[i][j][k]);
                     //printf("V_old[i][j][k] %lf \n",V_old[i][j][k]);
@@ -173,6 +175,7 @@ int writeToFile(){
 
 
 double max_of_V(){
+    //printf("new call\n\n\n\n\n");
     int i0, i1, i2, i3, i4;
     double temp;
     double max = fabs(V[0][0][0][0][0]-V_old[0][0][0][0][0]);
@@ -182,6 +185,7 @@ double max_of_V(){
                 for(i3=0; i3<x3_len;i3++){
                     for(i4=0; i4<w_len; i4++){
                         temp = fabs(V[i0][i1][i2][i3][i4]-V_old[i0][i1][i2][i3][i4]);
+                        //printf("%lf: V_old %lf: V\n",V_old[i0][i1][i2][i3][i4],V[i0][i1][i2][i3][i4]);
                         if(temp > max){
                             max = temp;
                         }
