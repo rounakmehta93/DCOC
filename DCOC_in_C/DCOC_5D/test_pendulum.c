@@ -36,6 +36,7 @@ void test_pendulum(){
     int i,exit_i = arr_len;
     double x_array[num_states][arr_len], t_array[arr_len], u_array[arr_len];
     double w_array[arr_len];
+    double V_array[arr_len];
     
     for(i=0;i<arr_len;i++){
         t_array[i] = 0 + del_t*i;
@@ -56,7 +57,7 @@ void test_pendulum(){
             exit_i = i;
             break;
         }
-        u = get_u_value_iteration(x,w);
+        u = get_u_value_iteration(x,w, &V_array[i]);
         w = markov_model(w);
         //printf("w %lf\n",w);
         pendulum_nonlinearmodel_ss(x, u, w, x, lol);
@@ -68,11 +69,11 @@ void test_pendulum(){
         w_array[i] = w;
         
     }
-    writeToFileXU(x_array,u_array,w_array,t_array,exit_i);
+    writeToFileXU(x_array,u_array,w_array,t_array,V_array,exit_i);
 
 }
 
-double get_u_value_iteration(double x[num_states],double w){
+double get_u_value_iteration(double x[num_states],double w,double *V_in_arr){
     double g = 1;
     int lol = 1;
     double x_new[num_states];
@@ -80,20 +81,23 @@ double get_u_value_iteration(double x[num_states],double w){
     double temp_u[u_len];
     int k;
     int max_temp_c=0;
+    double V_temp;
     for(int c=0;c<u_len;c++){
         pendulum_nonlinearmodel_ss(x, u_space[c], w, x_new, lol);
         
-        temp_u[c] = g;
+        temp_u[c] = g; //also reset for different u's
         for(int d=0;d<w_len;d++){
             temp_w[d] = interpol_4D(x_new[0], x_new[1], x_new[2],x_new[3], w_space[d]);
             //printf("%lf temp_w[d]\n",temp_w[d]);
             k = indexOfw(w);
             temp_u[c] = temp_u[c] + temp_w[d]*prob_matrix[k][d];
+            V_temp = temp_w[d]*prob_matrix[k][d];
             
         }
         //printf("temp u[c] %lf\n",temp_u[c]);
         if(temp_u[c]>temp_u[max_temp_c]){
             max_temp_c = c;
+            *V_in_arr = V_temp;
         }
         
     }
@@ -187,7 +191,7 @@ double markov_model(double w){
 }
 
 
-int writeToFileXU(double x_array[2][arr_len], double u_array[arr_len], double w_array[arr_len], double t_array[arr_len], int exit_i){
+int writeToFileXU(double x_array[2][arr_len], double u_array[arr_len], double w_array[arr_len], double t_array[arr_len], double V_array[arr_len],int exit_i){
     int i;
     FILE *outfile;
     char *outfilename = "/Users/Rounak/Desktop/Summer project/DCOC/DCOC_in_C/DCOC_5D/XandU.txt";
@@ -200,10 +204,10 @@ int writeToFileXU(double x_array[2][arr_len], double u_array[arr_len], double w_
     else{
         printf("\nfile opened. Output = t x[0] x[1] u\n");
     }
-    fprintf(outfile,"%s %s %s %s %s %s %s\n","t","x0","x1","x2","x3","u","w");
+    fprintf(outfile,"%s %s %s %s %s %s %s %s\n","t","x0","x1","x2","x3","u","w","V_max");
     for(i=0;i<exit_i;i++)
     {
-       fprintf(outfile,"%lf %lf %lf %lf %lf %lf %lf\n",t_array[i],x_array[0][i], x_array[1][i], x_array[2][i], x_array[3][i], u_array[i], w_array[i]);
+       fprintf(outfile,"%lf %lf %lf %lf %lf %lf %lf %lf\n",t_array[i],x_array[0][i], x_array[1][i], x_array[2][i], x_array[3][i], u_array[i], w_array[i], V_array[i]);
     }
     fclose(outfile);
     

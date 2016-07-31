@@ -25,3 +25,7 @@ title('u')
 subplot(6,1,6)
 stairs(states.t,states.w)
 title('w')
+
+figure(2)
+stairs(states.t,states.V_max)
+title('V')

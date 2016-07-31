@@ -17,7 +17,7 @@ double prob_matrix[PROB_MATRIX_LEN][PROB_MATRIX_LEN] = {{1}};/*
                                                         {0.3, 0.1, 0.3,0.1, 0.2}};*/
 double del_t = 0.002;
 double u_space[u_len] = {-5,-2.5,0,2.5,5};
-double w_space[w_len] = {5.1};//{-5.2,-2.6,0,2.6,5.2};//needs to be equally spaced //needs to have at least 2 elements for interpolation
+double w_space[w_len] = {-5.1};//{-5.2,-2.6,0,2.6,5.2};//needs to be equally spaced //needs to have at least 2 elements for interpolation
 
 double x1_space[x1_len],x2_space[x2_len],x3_space[x3_len];
 double x0_space[x0_len];

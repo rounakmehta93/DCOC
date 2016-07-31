@@ -14,8 +14,8 @@
 extern int arr_len;
 void test_pendulum();
 void load_V();
-double get_u_value_iteration(double x[num_states],double w);
+double get_u_value_iteration(double x[num_states],double w,double *V_in_arr);
 int indexOfw(double w);
 double markov_model(double w);
-int writeToFileXU(double x_array[2][arr_len], double u_array[arr_len], double w_array[arr_len], double t_array[arr_len], int exit_i);
+int writeToFileXU(double x_array[2][arr_len], double u_array[arr_len], double w_array[arr_len], double t_array[arr_len], double V_array[arr_len], int exit_i);
 #endif /* test_pendulum_h */
