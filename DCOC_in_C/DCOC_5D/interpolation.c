@@ -20,7 +20,7 @@ int find_nearest_neighbor(double val, double step_size, double min, double max){
     if(val < min || val > max)
         return -1;
     ix = ((val - min)/step_size);
-    if(val == max){
+    if(val == max && w_len!=1){
         ix--;
     }
     return(ix);
@@ -47,7 +47,7 @@ double interpol_5D(double x0, double x1,double  x2, double  x3, double w){
     
     step_size_w = w_space[1]-w_space[0];
     if(w_len == 1){
-        printf("w len %d",w_len);
+        //printf("w len %d",w_len);
         step_size_w = 0.00001; //to avoid 0/0
     }
     

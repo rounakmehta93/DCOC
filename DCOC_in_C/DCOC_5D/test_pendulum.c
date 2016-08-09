@@ -86,15 +86,19 @@ double get_u_value_iteration(double x[num_states],double w,double *V_in_arr){
         pendulum_nonlinearmodel_ss(x, u_space[c], w, x_new, lol);
         
         temp_u[c] = g; //also reset for different u's
+        V_temp = 0;
         for(int d=0;d<w_len;d++){
             temp_w[d] = interpol_4D(x_new[0], x_new[1], x_new[2],x_new[3], w_space[d]);
             //printf("%lf temp_w[d]\n",temp_w[d]);
             k = indexOfw(w);
             temp_u[c] = temp_u[c] + temp_w[d]*prob_matrix[k][d];
-            V_temp = temp_w[d]*prob_matrix[k][d];
+            V_temp = V_temp + temp_w[d]*prob_matrix[k][d]; //expected value of V_temp
             
         }
         //printf("temp u[c] %lf\n",temp_u[c]);
+        if(c == 0){
+            *V_in_arr = V_temp; //initialization
+        }
         if(temp_u[c]>temp_u[max_temp_c]){
             max_temp_c = c;
             *V_in_arr = V_temp;

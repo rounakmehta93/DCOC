@@ -91,7 +91,7 @@ int value_iteration(){
     //printf("%f probmatrix\n",prob_matrix[0][0]);
     //printf("%f sc\n",stopping_criterion);
     //printf("%f x\n",x_new[1]);
-    pendulum_nonlinearmodel_ss(x_old, u_space[c], w_space[k],x_new);
+    //pendulum_nonlinearmodel_ss(x_old, u_space[c], w_space[k],x_new);
     //printf("%f x\n",x_new[1]);
     
     float debug;
@@ -120,7 +120,7 @@ int value_iteration(){
                         x_old[0] = x1_space[i];
                         x_old[1] = x2_space[j];
                         //printf("1 %f 2 %f 3 %f 4 %f\n", x1_space[i], x2_space[j],u_space[c], w_space[k]);
-                        pendulum_nonlinearmodel_ss(x_old, u_space[c], w_space[k],x_new);
+                        pendulum_nonlinearmodel_ss1(x_old, u_space[c], w_space[k],x_new);
                         //printf("non linear %f %f \n",x_new[0],x_new[1]);
                         temp_u[c] = g;
                         for(d=0;d<w_len;d++){
@@ -195,9 +195,9 @@ int value_iteration(){
 }
 
 void pendulum_nonlinearmodel_ss(float X[num_states], float U, float F, float x_new[num_states]){
-    
+    //th is 0 when pendulum is in stable equilibrium. ccw +ve. U : input torque. F: disturbance force
     float m = 0.2;
-    float b = 0.001;
+    float b = 0;//0.001;
     float I = 0.006;
     float g = 9.8;
     float l = 0.3;

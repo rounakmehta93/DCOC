@@ -15,3 +15,7 @@ title('th dot')
 subplot(3,1,3)
 stairs(states.t,states.u)
 title('u')
+
+figure(2)
+plot(states.t,states.V)
+title('V');

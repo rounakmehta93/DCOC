@@ -5,7 +5,7 @@
 //  Created by Rounak on 8/7/16.
 //  Copyright © 2016 Rounak. All rights reserved.
 //
-
+#include "globals.h"
 #include "test_pendulum.h"
 #include "pendulum_model.h"
 #include "interpolation.h"
@@ -27,14 +27,15 @@ int arr_len;
 
 
 void test_pendulum(){
-    srand ( (uint)time(NULL) ); //otherwise we get same random number sequence.
+    srand (time(NULL));//otherwise we get same random number sequence.
     float u, w = w_space[0];
     float t_max = 30;
-    float x[2] = {0,0};
+    float x[2] = {-PI/10,0};
     arr_len = t_max/del_t + 1;
     int i,exit_i = arr_len;
     float x_array[2][arr_len], t_array[arr_len], u_array[arr_len];
-    
+    float V_array[arr_len];
+
     float x1_space[x1_len];
     float x2_space[x2_len];
     for(i=0;i<x1_len;i++){
@@ -65,7 +66,7 @@ void test_pendulum(){
             exit_i = i;
             break;
         }
-        u = get_u_value_iteration(V,x,w,x1_space, x2_space);
+        u = get_u_value_iteration(V,x,w,x1_space, x2_space, &V_array[i]);
         w = markov_model(w);
         //printf("w %f\n",w);
         pendulum_nonlinearmodel_ss1(x, u, w, x);
@@ -74,32 +75,44 @@ void test_pendulum(){
         u_array[i] = u;
         
     }
-    writeToFileXU(x_array,u_array,t_array,exit_i);
+    writeToFileXU(x_array,u_array,t_array,V_array,exit_i);
 
 }
 
-float get_u_value_iteration(float V[x1_len][x2_len][w_len],float x[num_states],float w, float x1_space[x1_len], float x2_space[x2_len]){
+float get_u_value_iteration(float V[x1_len][x2_len][w_len],float x[num_states],float w, float x1_space[x1_len], float x2_space[x2_len], float *V_in_arr){
     float g = 1;
     float x_new[num_states];
     float temp_w[w_len];
     float temp_u[u_len];
     int k;
     int max_temp_c=0;
+    float V_temp;
+
     for(int c=0;c<u_len;c++){
         pendulum_nonlinearmodel_ss1(x, u_space[c], w, x_new);
         
         temp_u[c] = g;
+        V_temp = 0;
         for(int d=0;d<w_len;d++){
             temp_w[d] = interpol_3D(x1_space, x2_space, w_space, V, x_new[0], x_new[1], w_space[d]);
-            //printf("%f temp_w[d]\n",temp_w[d]);
+            //printf("%f temp_w[%d]\n",temp_w[d],d);
             k = indexOfw(w);
+
             temp_u[c] = temp_u[c] + temp_w[d]*prob_matrix[k][d];
+            V_temp = V_temp + temp_w[d]*prob_matrix[k][d]; //expected value of V
+            //printf("%f V_temp\n",V_temp);
             
         }
-        //printf("temp u[c] %f\n",temp_u[c]);
-        if(temp_u[c]>temp_u[max_temp_c]){
-            max_temp_c = c;
+        printf("temp u[c] %f temp_u[max_temp_c] %f\n",temp_u[c], temp_u[max_temp_c]);
+        if(c == 0){
+            *V_in_arr = V_temp; //initialization
         }
+        if(temp_u[c]>temp_u[max_temp_c]){
+            //printf("lol\n");
+            max_temp_c = c;
+            *V_in_arr = V_temp;
+        }
+        
         
     }
     return(u_space[max_temp_c]);
@@ -180,7 +193,7 @@ float markov_model(float w){
 }
 
 
-int writeToFileXU(float x_array[2][arr_len], float u_array[arr_len], float t_array[arr_len], int exit_i){
+int writeToFileXU(float x_array[2][arr_len], float u_array[arr_len], float t_array[arr_len], float V_array[arr_len], int exit_i){
     int i;
     FILE *outfile;
     char *outfilename = "/Users/Rounak/Desktop/Summer project/DCOC/DCOC_in_C/DCOC_in_C/XandU.txt";
@@ -193,10 +206,10 @@ int writeToFileXU(float x_array[2][arr_len], float u_array[arr_len], float t_arr
     else{
         printf("\nfile opened. Output = t x[0] x[1] u\n");
     }
-    fprintf(outfile,"%s %s %s %s\n","t","x1","x2","u");
+    fprintf(outfile,"%s %s %s %s %s\n","t","x1","x2","u","V");
     for(i=0;i<exit_i;i++)
     {
-       fprintf(outfile,"%f %f %f %f\n",t_array[i],x_array[0][i], x_array[1][i],u_array[i]);
+       fprintf(outfile,"%f %f %f %f %f\n",t_array[i],x_array[0][i], x_array[1][i],u_array[i], V_array[i]);
     }
     fclose(outfile);
     

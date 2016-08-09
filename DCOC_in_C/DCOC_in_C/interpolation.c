@@ -16,7 +16,7 @@ int find_nearest_neighbor(float val, float step_size, float min, float max){
     if(val < min || val > max)
         return -1;
     ix = ((val - min)/step_size);
-    if(val == max){
+    if(val == max && w_len!=1){
         ix--;
     }
     return(ix);
@@ -48,7 +48,9 @@ float interpol_3D(float x1_space[x1_len], float x2_space[x2_len], float w_space[
     step_size[0] = x1_space[1]-x1_space[0];
     step_size[1] = x2_space[1]-x2_space[0];
     step_size[2] = w_space[1]-w_space[0];
-    
+    if(w_len == 1){
+        step_size[2] = 0.00001;
+    }
     int ix1,ix2,ix3;
     ix1 = find_nearest_neighbor(x1 ,step_size[0], x1_space[0], x1_space[x1_len-1]);
     ix2 = find_nearest_neighbor(x2 ,step_size[1], x2_space[0], x2_space[x2_len-1]);

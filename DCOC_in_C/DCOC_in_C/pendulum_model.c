@@ -21,9 +21,10 @@ extern int num_states;
 
 void pendulum_nonlinearmodel_ss1(float X[num_states], float U, float F, float x_new[num_states]){
     //printf("delt %f",del_t);
-    
+    //th is 0 when pendulum is in stable equilibrium. ccw +ve. U : input torque. F: disturbance force
+
     float m = 0.2;
-    float b = 0.001;
+    float b = 0;//0.001;
     float I = 0.006;
     float g = 9.8;
     float l = 0.3;

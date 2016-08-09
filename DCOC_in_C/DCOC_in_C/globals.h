@@ -10,7 +10,7 @@
 #define globals_h
 #define PI 3.14
 #include <stdio.h>
-
+#define W_LEN 1
 
 
 void init_value_iteration();
