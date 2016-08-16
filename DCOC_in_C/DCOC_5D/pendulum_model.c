@@ -20,7 +20,7 @@ extern double step_size[];
 extern double stopping_criterion;
 
 
-void pendulum_nonlinearmodel_ss(double X[num_states], double V, double dist, double x_new[num_states], int lol)
+void pendulum_nonlinearmodel_ss(double X[num_states], double V, double dist, double x_new[num_states])
 {
     //V is input voltage. dist is diturbance voltage
 

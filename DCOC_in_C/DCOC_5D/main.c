@@ -78,6 +78,8 @@ int value_iteration(){
 
     
     while(max_of_V() > stopping_criterion){
+
+        
         deepcopy();
         
         #pragma omp parallel num_threads(NTHREADS)
@@ -111,14 +113,16 @@ void parallel(int i0){
                         x_old[1] = x1_space[i1];
                         x_old[2] = x2_space[i2];
                         x_old[3] = x3_space[i3];
-                        int lol = 2;
+                        
                         //printf("1 %lf 2 %lf 3 %lf 4 %lf\n", x1_space[i], x2_space[j],u_space[c], w_space[k]);
-                        pendulum_nonlinearmodel_ss(x_old, u_space[c], w_space[k],x_new,lol);
-                        //printf("non linear %lf %lf \n",x_new[0],x_new[1]);
+                        pendulum_nonlinearmodel_ss(x_old, u_space[c], w_space[k],x_new);
+
+                        //printf("x_old %lf %lf %lf %lf u %lf\n",x_old[0],x_old[1],x_old[2],x_old[3], u_space[c]);
+                        //printf("x_new %lf %lf %lf %lf\n",x_new[0],x_new[1],x_new[2],x_new[3]);
                         temp_u[c] = g;
                         for(int d=0;d<w_len;d++){
                             temp_w[d] = interpol_4D(x_new[0], x_new[1], x_new[2],x_new[3], w_space[d]);
-                            //printf("%lf temp_w[d]\n",temp_w[d]);
+                            //printf("%lf temp_w[d] %d %d %d %d %d %d\n",temp_w[d], i0, i1,i2,i3,k, c);
                             temp_u[c] = temp_u[c] + temp_w[d]*prob_matrix[k][d];
                             
                         }
@@ -129,8 +133,9 @@ void parallel(int i0){
                         
                     }
                     //printf("%lf temp_u[max_temp]\n",temp_u[max_temp_c]);
+                    //printf("max_temp_c %d\n",max_temp_c);
                     V[i0][i1][i2][i3][k] = temp_u[max_temp_c];
-                    //printf("V[i][j][k] %lf \n",V[i][j][k]);
+                    //printf(" V[i0][i1][i2][i3][k] %lf \n",V[i0][i1][i2][i3][k]);
                     //printf("V_old[i][j][k] %lf \n",V_old[i][j][k]);
                     //printf("================\n");
                 }

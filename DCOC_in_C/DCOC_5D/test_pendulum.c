@@ -60,7 +60,7 @@ void test_pendulum(){
         u = get_u_value_iteration(x,w, &V_array[i]);
         w = markov_model(w);
         //printf("w %lf\n",w);
-        pendulum_nonlinearmodel_ss(x, u, w, x, lol);
+        pendulum_nonlinearmodel_ss(x, u, w, x);
         x_array[0][i] = x[0];
         x_array[1][i] = x[1];
         x_array[2][i] = x[0];
@@ -83,7 +83,7 @@ double get_u_value_iteration(double x[num_states],double w,double *V_in_arr){
     int max_temp_c=0;
     double V_temp;
     for(int c=0;c<u_len;c++){
-        pendulum_nonlinearmodel_ss(x, u_space[c], w, x_new, lol);
+        pendulum_nonlinearmodel_ss(x, u_space[c], w, x_new);
         
         temp_u[c] = g; //also reset for different u's
         V_temp = 0;
