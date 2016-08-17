@@ -1,0 +1,5 @@
+Improvements: = for more imp. - for less imp.
+= use structs instead of global variables. Cleaner.
+- P threads if fopenmp doesn't work.
+= triange g.
+- regression testing

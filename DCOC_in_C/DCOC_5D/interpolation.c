@@ -23,11 +23,12 @@ int find_nearest_neighbor(double val, double step_size, double min, double max){
     if(val == max && w_len!=1){
         ix--;
     }
+    //printf("val %lf step size %lf, ix %d \n",val,step_size, ix);
     return(ix);
 }
 
 double interpol_1D(double v0, double v1, double x0, double val, double step_size){
-    
+    //printf("v0 %lf v1 %lf x0 %lf val %lf step_size %lf iterpol %lf \n",v0,v1,x0,val,step_size,v0 + (v1 - v0) * (val - x0)/step_size);
     return (v0 + (v1 - v0) * (val - x0)/step_size );
 }
 
