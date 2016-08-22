@@ -16,7 +16,7 @@ float u_space[] = {-0.01,0,0.01};
 float w_space[] = {0.6};//{-0.1,0,0.1};
 float x_min[] = {-PI/8,-10};
 float x_max[] = {PI/8,10};
-float step_size[] = {PI/20,0.1};
+float step_size[] = {PI/60,0.1};
 float stopping_criterion = 0.01;
 int num_states = 2;
 

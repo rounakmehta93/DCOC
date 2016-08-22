@@ -13,7 +13,7 @@
 
 #define NTHREADS 2
 #define PROB_MATRIX_LEN 1
-#define x0_len 5//10
+#define x0_len 5//10 30 each
 #define x1_len 5//15 all
 #define x2_len 5
 #define x3_len 5

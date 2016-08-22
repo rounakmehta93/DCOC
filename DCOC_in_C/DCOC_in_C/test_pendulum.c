@@ -30,7 +30,7 @@ void test_pendulum(){
     srand (time(NULL));//otherwise we get same random number sequence.
     float u, w = w_space[0];
     float t_max = 30;
-    float x[2] = {-PI/10,0};
+    float x[2] = {0,0};
     arr_len = t_max/del_t + 1;
     int i,exit_i = arr_len;
     float x_array[2][arr_len], t_array[arr_len], u_array[arr_len];
