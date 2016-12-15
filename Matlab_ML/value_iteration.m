@@ -42,9 +42,7 @@ iteration = 0;
 K =exp(-dist2(X',X')/(2*sigma^2));
 while abs(max(V(:)-V_old(:))) > stopping_criterion
     V_old = V;
-    
    
-    %K =exp(-dist2(X',X')/(2*sigma^2));
    
     for i = 1:n_bar
      
@@ -65,7 +63,7 @@ while abs(max(V(:)-V_old(:))) > stopping_criterion
         
         V(i) = max(temp_u);
         
-     
+     %for each point 
     end
 
 iteration = iteration + 1

@@ -21,10 +21,11 @@ V = temp.V;
 temp = load('alpha.mat');
 alpha = temp.alpha;
 X = temp.X;
+
 exit_i = size(t_array,2);
 for i = 2:size(t_array,2)
     %u = -K*x;
-    [u,V] = get_u_value_iteration(alpha,X,x,w);
+    [u,V_val] = get_u_value_iteration(alpha,X,x,w);
     if isnan(u)
         exit_i = i;
         break;
@@ -35,11 +36,12 @@ for i = 2:size(t_array,2)
     x(1) = minimize_angle(x(1));
     x_array(:,i) = x;
     u_array(:,i) = u;
-    V_array(:,i) = V;
+    V_array(:,i) = V_val;
     
     
     
 end
+figure(1)
 subplot(4,1,1)
 stairs(t_array(:,1:exit_i),x_array(1,1:exit_i))
 title('th')
@@ -60,6 +62,12 @@ subplot(4,1,4)
 stairs(t_array(1,1:exit_i),V_array(1,1:exit_i))
 title('V')
 
+figure(2)
+%values vs coordinates of the values.
+scatter3(X(:,1),X(:,2),V)
+zlabel('V')
+xlabel('x1')
+ylabel('x2')
 
 % play around with parameters
 % grid density vs time and results
