@@ -1,4 +1,4 @@
-
+close all
 global w_space;
 global sigma;
 

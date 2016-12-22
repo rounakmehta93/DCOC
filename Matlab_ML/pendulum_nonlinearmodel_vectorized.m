@@ -1,4 +1,4 @@
-function X_new = pendulum_nonlinearmodel_vectorized(X,U,F,del_t)
+function X_new = pendulum_nonlinearmodel_vectorized(X,U_ENERGY,U,F,del_t)
 global n_bar;
 X_new = zeros(n_bar,2);
 m = 0.2;

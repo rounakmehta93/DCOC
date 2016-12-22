@@ -1,3 +1,9 @@
+%%TODOs
+%bug: ability to change n_bar
+%bug: diverges for w_space > 1
+%u_energy as another state.
+%get loss: distance of training points with functions.
+
 %% other parameters
 global del_t;
 global prob_matrix;
@@ -17,7 +23,7 @@ global w_space; %disturbances
 
 %% init
 global n_bar;
-n_bar = 500; % total no. of data points to use
+n_bar = 1000; % total no. of data points to use
 n_bar_edge = 20; %per edge
 assert(n_bar > n_bar_edge * num_states *2)
 
@@ -37,9 +43,18 @@ for i = 1:num_states
     
 end
 
+%append u_energy random values.
+X_energy = rand(n_bar,1) * u_energy_max + 0;
+X = [X X_energy];
+
 %append random w_values
 W_indices = randi(size(w_space,2),n_bar,1);
-X = [X w_space(W_indices)'];
+X = [X w_space(:,W_indices)'];
+
+
+
+
+
 
 %initialize Value function estimate at these points
 V = zeros(size(X,1),1);
@@ -58,6 +73,7 @@ sigma=15; % for gaussian kernel
 lambda=0.000001;%0.003;
 iteration = 0;
 K =exp(-dist2(X,X)/(2*sigma^2));
+X_new = zeros(n_bar,num_states,size(u_space,2));
 
 while abs(max(V(:)-V_old(:))) > stopping_criterion
     V_old = V;
@@ -65,10 +81,11 @@ while abs(max(V(:)-V_old(:))) > stopping_criterion
    
     %stack the array as such [X,u1,w1 X,u2,w1, X,u1,w2 X,u2,w2]' 
     for c = 1:size(u_space,2)
-        X_new(:,:,c) = pendulum_nonlinearmodel_vectorized(X(:,1:2),u_space(c),X(:,3),del_t);
+        X_new(:,:,c) = pendulum_nonlinearmodel_vectorized(X(:,1:2),u_space(c),X(:,4),del_t);
+        
         % we know what the current disturbance is. 
     end
-    
+    %get the [X,u1 ; X,u2] from [X,u1 X,u2]
     Xtemp1 = reshape(X_new, [n_bar*size(u_space,2) num_states]);
     %using max instead of an OR condition to work on a matrix. 0 or 1
     %anyways. 1 when it does go out of bounds
@@ -76,16 +93,23 @@ while abs(max(V(:)-V_old(:))) > stopping_criterion
     %1 where the value should be 0. logical matrix
     exit_indices = sum(exit_indices_matrix,2) > 0;
     
+    %get the [w1 w2 w3; w1 w2 w3 ...] vector
+    Wtemp0 = repmat(w_space,[size(Xtemp1,1) 1]);
+    %{
     for d = 1:size(w_space,2)
         Wtemp0(:,d) = repmat(w_space(d),[size(Xtemp1,1) 1]);
     end
-    Wtemp = reshape(Wtemp0,[size(Wtemp0,1)*size(Wtemp0,2), 1]);% need to test when w space is >1. Diverging
+    %}
+    %get the [w1; w1; ... w2; w2;...; w3; w3...] vector
+    Wtemp = reshape(Wtemp0,[size(Wtemp0,1)*size(Wtemp0,2), 1]);
+    %get the [X,u1,w1; X,u2,w1; X,u1,w2; X,u2,w2] vector
     X_temp2 = [repmat(Xtemp1,[size(w_space,2), 1]) Wtemp];
     
     K_ = exp(-dist2(X,X_temp2)/(2*sigma^2));
     
     V_temp = ( V' * inv(K + n_bar*lambda*eye(n_bar) ) * K_ )';
     %convert the stacked array to a matrix. [n_bar*uspace*wspace.
+    % need to test when w space is >1. Diverging
     V_temp2 = reshape(V_temp, [n_bar*size(u_space,2), size(w_space,2)]); 
     V_temp2(exit_indices,:) = 0;
     V_expectation = sum(V_temp2,2);
