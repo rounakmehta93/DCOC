@@ -13,7 +13,7 @@ global u_energy_max;
 u_energy_max = 500;
 u_energy = u_energy_max;
 u_space = 0.01*[-1,-0.75,-0.5,-0.25,0,0.25,0.5,0.75,1]; %inputs
-u_energy_multiplier = 1;
+u_energy_multiplier = 10;
 prob_matrix = [1];%[0.5 0.1 0.4; 0.1 0.2 0.7; 0.3 0.3 0.4];
 w_space = 0.1*[1]; %disturbances
 

@@ -23,9 +23,9 @@ global w_space; %disturbances
 
 %% init
 global n_bar;
-n_bar = 1000; % total no. of data points to use
+n_bar = 10000; % total no. of data points to use
 n_bar_edge = 20; %per edge
-assert(n_bar > n_bar_edge * num_states *2)
+assert(n_bar > n_bar_edge * (num_states+1) *2)
 
 %generate random numbers in the desired range
 X = rand(n_bar, num_states);
@@ -46,6 +46,8 @@ end
 %append u_energy random values.
 X_energy = rand(n_bar,1) * u_energy_max + 0;
 X = [X X_energy];
+
+X(2*n_bar_edge*num_states + 1 : 2*n_bar_edge*num_states + 2*n_bar_edge, num_states+1) = 0;
 
 %append random w_values
 W_indices = randi(size(w_space,2),n_bar,1);
@@ -73,7 +75,7 @@ sigma=15; % for gaussian kernel
 lambda=0.000001;%0.003;
 iteration = 0;
 K =exp(-dist2(X,X)/(2*sigma^2));
-X_new = zeros(n_bar,num_states,size(u_space,2));
+X_new = zeros(n_bar,num_states+1,size(u_space,2));
 
 while abs(max(V(:)-V_old(:))) > stopping_criterion
     V_old = V;
@@ -81,15 +83,16 @@ while abs(max(V(:)-V_old(:))) > stopping_criterion
    
     %stack the array as such [X,u1,w1 X,u2,w1, X,u1,w2 X,u2,w2]' 
     for c = 1:size(u_space,2)
-        X_new(:,:,c) = pendulum_nonlinearmodel_vectorized(X(:,1:2),u_space(c),X(:,4),del_t);
+        X_new(:,:,c) = pendulum_nonlinearmodel_vectorized(X(:,1:2),X(:,3),u_space(c),X(:,4),del_t);
         
         % we know what the current disturbance is. 
     end
     %get the [X,u1 ; X,u2] from [X,u1 X,u2]
-    Xtemp1 = reshape(X_new, [n_bar*size(u_space,2) num_states]);
+    Xtemp1 = reshape(X_new, [n_bar*size(u_space,2) num_states+1]);
     %using max instead of an OR condition to work on a matrix. 0 or 1
     %anyways. 1 when it does go out of bounds
-    exit_indices_matrix = max(Xtemp1 > repmat(x_max',[size(Xtemp1,1),1]) , Xtemp1 < repmat(x_min',[size(Xtemp1,1),1]));
+    exit_indices_matrix = max(Xtemp1 > repmat([x_max; inf]',[size(Xtemp1,1),1]) ,...
+                              Xtemp1 < repmat([x_min; 0]',[size(Xtemp1,1),1]));
     %1 where the value should be 0. logical matrix
     exit_indices = sum(exit_indices_matrix,2) > 0;
     
