@@ -1,8 +1,8 @@
 close all
 global w_space;
 global sigma;
-
-
+global u_energy_max;
+u_energy = u_energy_max;
 u = 0;
 w = w_space(1); %initialization
 global del_t;
@@ -11,6 +11,7 @@ t_max = 20;
 x = [pi/20,0]';
 %K = pendulum_lqr_solution(del_t);
 x_array = zeros(2,t_max/del_t+1);
+w_array = zeros(1,t_max/del_t+1);
 t_array = 0:del_t:t_max;
 u_array = zeros(1,t_max/del_t+1);
 V_array = zeros(1,t_max/del_t+1);
@@ -18,7 +19,7 @@ i = 1;
 x_array(:,i) = x;
 temp = load('V.mat');
 V = temp.V;
-temp = load('alpha.mat');
+%temp = load('alpha.mat');
 alpha = temp.alpha;
 X = temp.X;
 
@@ -34,6 +35,7 @@ for i = 2:size(t_array,2)
     x = pendulum_nonlinearmodel_ss(x,u,w,del_t);
     
     x(1) = minimize_angle(x(1));
+    w_array(:,i) = w;
     x_array(:,i) = x;
     u_array(:,i) = u;
     V_array(:,i) = V_val;
@@ -42,23 +44,27 @@ for i = 2:size(t_array,2)
     
 end
 figure(1)
-subplot(4,1,1)
+subplot(5,1,1)
 stairs(t_array(:,1:exit_i),x_array(1,1:exit_i))
 title('th')
 
 
 
-subplot(4,1,2)
+subplot(5,1,2)
 stairs(t_array(:,1:exit_i),x_array(2,1:exit_i))
 title('th dot')
 
 
 
-subplot(4,1,3)
+subplot(5,1,3)
 stairs(t_array(1,1:exit_i),u_array(1,1:exit_i))
 title('u')
 
-subplot(4,1,4)
+subplot(5,1,4)
+stairs(t_array(1,1:exit_i),w_array(1,1:exit_i))
+title('w')
+
+subplot(5,1,5)
 stairs(t_array(1,1:exit_i),V_array(1,1:exit_i))
 title('V')
 

@@ -43,12 +43,6 @@ for i = 1:num_states
     
 end
 
-%append u_energy random values.
-X_energy = rand(n_bar,1) * u_energy_max + 0;
-X = [X X_energy];
-
-X(2*n_bar_edge*num_states + 1 : 2*n_bar_edge*num_states + 2*n_bar_edge, num_states+1) = 0;
-
 %append random w_values
 W_indices = randi(size(w_space,2),n_bar,1);
 X = [X w_space(:,W_indices)'];
@@ -71,28 +65,29 @@ K_vector = zeros(n_bar,n_bar*size(u_space,2)*size(w_space,2));
 %% Value iteration
 global g;
 global sigma;
-sigma=15; % for gaussian kernel
-lambda=0.000001;%0.003;
+%sigma=1; % for gaussian kernel defined in init
+lambda=0.0001;%0.000001 %0.003;
 iteration = 0;
 K =exp(-dist2(X,X)/(2*sigma^2));
-X_new = zeros(n_bar,num_states+1,size(u_space,2));
-
-while abs(max(V(:)-V_old(:))) > stopping_criterion
+X_new = zeros(n_bar,num_states,size(u_space,2));
+PROB_MATRIX = zeros(n_bar*size(u_space,2), size(prob_matrix,1));
+err = abs(max(V(:)-V_old(:)));
+while err > stopping_criterion
     V_old = V;
    
    
     %stack the array as such [X,u1,w1 X,u2,w1, X,u1,w2 X,u2,w2]' 
     for c = 1:size(u_space,2)
-        X_new(:,:,c) = pendulum_nonlinearmodel_vectorized(X(:,1:2),X(:,3),u_space(c),X(:,4),del_t);
+        X_new(:,:,c) = pendulum_nonlinearmodel_vectorized(X(:,1:num_states),u_space(c),X(:,3),del_t);
         
         % we know what the current disturbance is. 
     end
     %get the [X,u1 ; X,u2] from [X,u1 X,u2]
-    Xtemp1 = reshape(X_new, [n_bar*size(u_space,2) num_states+1]);
+    Xtemp1 = reshape(X_new, [n_bar*size(u_space,2) num_states]);
     %using max instead of an OR condition to work on a matrix. 0 or 1
     %anyways. 1 when it does go out of bounds
-    exit_indices_matrix = max(Xtemp1 > repmat([x_max; inf]',[size(Xtemp1,1),1]) ,...
-                              Xtemp1 < repmat([x_min; 0]',[size(Xtemp1,1),1]));
+    exit_indices_matrix = max(Xtemp1 > repmat(x_max',[size(Xtemp1,1),1]) ,...
+                              Xtemp1 < repmat(x_min',[size(Xtemp1,1),1]));
     %1 where the value should be 0. logical matrix
     exit_indices = sum(exit_indices_matrix,2) > 0;
     
@@ -115,7 +110,11 @@ while abs(max(V(:)-V_old(:))) > stopping_criterion
     % need to test when w space is >1. Diverging
     V_temp2 = reshape(V_temp, [n_bar*size(u_space,2), size(w_space,2)]); 
     V_temp2(exit_indices,:) = 0;
-    V_expectation = sum(V_temp2,2);
+    for p = 1:n_bar
+    %PROB_MATRIX_INDICES(p) = find(w_space == X(ceil(p/size(u_space,2)),num_states+1));
+    PROB_MATRIX(size(u_space,2)*(p-1)+1:size(u_space,2)*p ,:) = repmat(prob_matrix(find(w_space == X(p,num_states+1)),:),[size(u_space,2) 1]);
+    end
+    V_expectation = sum(V_temp2.*PROB_MATRIX ,2);%BUG HERE. multiply by prob matrix
     %at whatever index x exits the bounds we can set V to 0 vector
     V_expectation_reshape = reshape(V_expectation, [n_bar, size(u_space,2)]);
     V = max(V_expectation_reshape,[],2) + g;
@@ -139,10 +138,15 @@ while abs(max(V(:)-V_old(:))) > stopping_criterion
    
 
 iteration = iteration + 1
-abs(max(V(:)-V_old(:)))
+err = abs(max(V(:)-V_old(:)))
+error(iteration) = err;
 
 end
-save('V.mat','V');
+
 alpha = V' * inv(K + n_bar*lambda*eye(n_bar) );
-save('alpha.mat','alpha','X');
+
+save('V.mat','V','alpha','X');
 %save('alpha.mat','X');
+plot(1:iteration,error);
+xlabel('iterations')
+ylabel('error')

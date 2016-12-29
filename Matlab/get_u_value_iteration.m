@@ -1,4 +1,4 @@
-function u = get_u_value_iteration(V,x,w)
+function [u,V_val] = get_u_value_iteration(V,x,w)
 %% other parameters
 global del_t;
 global prob_matrix;
@@ -44,7 +44,7 @@ global g;
             end
             temp_u(c) = sum(temp_w.*prob_matrix(find(w_space==w),:)) + g;
         end
-        [~,u_index] = max(temp_u);
+        [V_val,u_index] = max(temp_u);
 u = u_space(u_index);
 
 

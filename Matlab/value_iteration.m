@@ -52,7 +52,11 @@ for i = 1:size(x1_space,2)
     end
 end
 iteration = iteration + 1
-abs(max(V(:)-V_old(:)))
-
+err = abs(max(V(:)-V_old(:)))
+error(iteration) = err;
 end
 save('V.mat','V');
+
+plot(1:iteration,error);
+xlabel('iterations')
+ylabel('error')

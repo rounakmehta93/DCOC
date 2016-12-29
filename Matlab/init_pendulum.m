@@ -7,13 +7,14 @@ del_t = 0.01;
 
 global u_space; %inputs
 global w_space; %disturbances
-u_space = 0.01*[-1,0,1]; %inputs
-w_space = 0.1*[-1,0,1]; %disturbances
+
+u_space = 0.03*[-1,-0.75,-0.5,-0.25,0,0.25,0.5,0.75,1]; %inputs
+w_space = 0.1*[1 2 3]; %disturbances
 
 global x_min;
 global x_max;
 global step_size;
-x_min = [-pi/8; -1];
+x_min = [0; -1];
 x_max = [pi/8; 1];
 step_size = [pi/20; 0.1];
 

@@ -1,7 +1,6 @@
-function X_new = pendulum_nonlinearmodel_vectorized(X,U_ENERGY,U,F,del_t)
+function X_new = pendulum_nonlinearmodel_vectorized(X,U,F,del_t)
 global n_bar;
-global u_energy_multiplier;
-X_new = zeros(n_bar,2+1);%for u_energy
+X_new = zeros(n_bar,2);
 m = 0.2;
 b = 0.001;
 I = 0.006;
@@ -14,4 +13,3 @@ th_ = X(:,2);
 T = U;
 X_new(:,1) = X(:,1) + del_t* th_;
 X_new(:,2) = X(:,2) + del_t* (-m*g*l*sin(th) -b*th_ + F.*l.*cos(th) + T)/I;
-X_new(:,3) = U_ENERGY - u_energy_multiplier * abs(U);

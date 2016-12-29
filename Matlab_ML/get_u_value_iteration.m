@@ -45,7 +45,7 @@ global g;
             x_new = pendulum_nonlinearmodel_ss([x(1);x(2)],u_space(c),w,del_t);
             for d = 1:size(w_space,2)
                 K_ = exp(-dist2(X,[x_new; w_space(d)]')/(2*sigma^2));
-                if (sum(x_new>x_max)>0 || sum(x_new<x_min) > 0)
+                if (sum(x_new>x_max)>0 || sum(x_new<x_min) > 0)%add u_energy later
                     temp_w(d) = 0;
                 else
                 temp_w(d) =alpha * K_;
